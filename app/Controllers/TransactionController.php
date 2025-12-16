@@ -6,10 +6,16 @@ use App\Core\View;
 use App\Models\Transaction;
 use App\Models\Category;
 use App\Models\Account;
-use App\Models\AuditLog;
 use App\Core\Security;
+use App\Services\AccountingService;
 
 class TransactionController {
+    private $accountingService;
+
+    public function __construct() {
+        $this->accountingService = new AccountingService();
+    }
+
     public function index() {
         if (!isset($_SESSION['user_id'])) {
             View::redirect('/login');
@@ -60,7 +66,6 @@ class TransactionController {
         Security::verifyCsrfToken($_POST['csrf_token'] ?? '');
 
         $data = [
-            'user_id' => $_SESSION['user_id'],
             'category_id' => $_POST['category_id'],
             'account_id' => $_POST['account_id'],
             'amount' => $_POST['amount'],
@@ -69,13 +74,13 @@ class TransactionController {
             'transaction_date' => $_POST['transaction_date']
         ];
 
-        $transactionModel = new Transaction();
-        $transactionModel->create($data);
-        
-        $auditLog = new AuditLog();
-        $auditLog->log($_SESSION['user_id'], 'CREATE', 'transactions', $this->db->lastInsertId(), null, $data);
+        try {
+            $this->accountingService->recordTransaction($_SESSION['user_id'], $data);
+            $_SESSION['success'] = 'Transaksi berhasil disimpan dan saldo diperbarui.';
+        } catch (\Exception $e) {
+            $_SESSION['error'] = 'Gagal menyimpan transaksi: ' . $e->getMessage();
+        }
 
-        $_SESSION['success'] = 'Transaksi berhasil disimpan';
         View::redirect('/transactions');
     }
 
@@ -88,7 +93,6 @@ class TransactionController {
         $transactionModel = new Transaction();
         $transaction = $transactionModel->findById($id);
 
-        // Security check
         if (!$transaction || $transaction['user_id'] != $_SESSION['user_id']) {
             View::redirect('/transactions');
         }
@@ -115,7 +119,6 @@ class TransactionController {
 
         $id = $_POST['id'];
         $data = [
-            'user_id' => $_SESSION['user_id'],
             'category_id' => $_POST['category_id'],
             'account_id' => $_POST['account_id'],
             'amount' => $_POST['amount'],
@@ -124,16 +127,13 @@ class TransactionController {
             'transaction_date' => $_POST['transaction_date']
         ];
 
-        $transactionModel = new Transaction();
-        // For audit, fetch old data
-        $oldData = $transactionModel->findById($id);
-        
-        $transactionModel->update($id, $data);
-        
-        $auditLog = new AuditLog();
-        $auditLog->log($_SESSION['user_id'], 'UPDATE', 'transactions', $id, $oldData, $data);
+        try {
+            $this->accountingService->updateTransaction($_SESSION['user_id'], $id, $data);
+            $_SESSION['success'] = 'Transaksi berhasil diperbarui dan saldo disesuaikan.';
+        } catch (\Exception $e) {
+            $_SESSION['error'] = 'Gagal memperbarui: ' . $e->getMessage();
+        }
 
-        $_SESSION['success'] = 'Transaksi berhasil diperbarui';
         View::redirect('/transactions');
     }
 
@@ -145,17 +145,14 @@ class TransactionController {
         Security::verifyCsrfToken($_POST['csrf_token'] ?? '');
 
         $id = $_POST['id'];
-        $transactionModel = new Transaction();
-        
-        // Audit
-        $oldData = $transactionModel->findById($id);
-        
-        $transactionModel->deleteForUser($id, $_SESSION['user_id']);
-        
-        $auditLog = new AuditLog();
-        $auditLog->log($_SESSION['user_id'], 'DELETE', 'transactions', $id, $oldData, null);
 
-        $_SESSION['success'] = 'Transaksi berhasil dihapus';
+        try {
+            $this->accountingService->deleteTransaction($_SESSION['user_id'], $id);
+            $_SESSION['success'] = 'Transaksi berhasil dihapus dan saldo dikembalikan.';
+        } catch (\Exception $e) {
+            $_SESSION['error'] = 'Gagal menghapus: ' . $e->getMessage();
+        }
+
         View::redirect('/transactions');
     }
 }

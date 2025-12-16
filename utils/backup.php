@@ -1,48 +1,78 @@
 <?php
-
-// Database Backup Script
+// Maunabung Auto-Backup Script
 // Usage: php utils/backup.php
 
-// Define configuration
-$host = 'localhost';
-$user = 'root';
-$password = ''; // Typically empty in local XAMPP/Laragon, change if needed
-$database = 'maunabung';
-$backupDir = __DIR__ . '/../backups/';
+require_once __DIR__ . '/../app/Core/Security.php';
+$config = require __DIR__ . '/../config/database.php';
 
-if (!file_exists($backupDir)) {
-    mkdir($backupDir, 0777, true);
+use App\Core\Security;
+
+// Configuration
+$backupDir = __DIR__ . '/../backups/';
+if (!is_dir($backupDir)) {
+    mkdir($backupDir, 0755, true);
 }
 
-$filename = $backupDir . 'backup_' . date('Y-m-d_H-i-s') . '.sql';
+$date = date('Y-m-d_H-i-s');
+$filename = "maunabung_backup_{$date}.sql";
+$encryptedFilename = "maunabung_backup_{$date}.enc";
 
-// Command for mysqldump (assuming it's in PATH, otherwise specify full path)
-// On Windows, you might need "C:/xampp/mysql/bin/mysqldump.exe" etc.
-$command = "mysqldump --user={$user} --password={$password} --host={$host} {$database} > {$filename}";
+echo "[*] Starting Backup Process...\n";
 
-// For XAMPP typical install if mysqldump not in path:
-// $command = "c:\xampp\mysql\bin\mysqldump --user={$user} --password={$password} --host={$host} {$database} > {$filename}";
+// 1. Dump Database
+$command = sprintf(
+    'mysqldump --user=%s --password=%s --host=%s %s > %s',
+    escapeshellarg($config['username']),
+    escapeshellarg($config['password']),
+    escapeshellarg($config['host']),
+    escapeshellarg($config['dbname']),
+    escapeshellarg($backupDir . $filename)
+);
 
-// Execute
-system($command, $output);
+system($command, $returnVar);
 
-if ($output === 0) {
-    echo "Backup berhasil: {$filename}\n";
+if ($returnVar !== 0) {
+    die("[!] Error: mysqldump failed with code $returnVar\n");
+}
+
+echo "[+] Database dumped to: {$filename}\n";
+
+// 2. Encrypt Backup (Security Requirement)
+// We use OpenSSL to encrypt the file content
+$content = file_get_contents($backupDir . $filename);
+if ($content === false) {
+    die("[!] Error reading dump file.\n");
+}
+
+// Generate a random key for this backup or use system key
+//Ideally we use a master public key, but for this standalone app we use the app key.
+// Note: Security::encrypt is for strings and adds base64 overhead. 
+// For files, we usually want raw binary. But let's stick to the App's Security class for consistency if possible,
+// OR use a dedicated file encryption routine. 
+// Given file size might be large, streaming encryption is better, but app is small.
+// We will use a custom encryption loop or just the Security class if it handles length well.
+// Security::encrypt uses AES-256-CBC and internal key. 
+// WARNING: If content is huge, memory limit might be hit.
+
+$encryptedContent = Security::encrypt($content);
+file_put_contents($backupDir . $encryptedFilename, $encryptedContent);
+
+// 3. Cleanup Plaintext
+unlink($backupDir . $filename);
+
+echo "[+] Backup Encrypted and Saved: {$encryptedFilename}\n";
+echo "[*] Done.\n";
+
+// Retention Policy: Keep only last 5 backups
+$files = glob($backupDir . '*.enc');
+if (count($files) > 5) {
+    usort($files, function($a, $b) {
+        return filemtime($a) - filemtime($b);
+    });
     
-    // Retention Policy: Delete backups older than 7 days
-    $files = glob($backupDir . '*.sql');
-    $now = time();
-    $days = 7;
-    
-    foreach ($files as $file) {
-        if (is_file($file)) {
-            if ($now - filemtime($file) >= 60 * 60 * 24 * $days) {
-                unlink($file);
-                echo "Backup lama dihapus: " . basename($file) . "\n";
-            }
-        }
+    $toDelete = count($files) - 5;
+    for ($i = 0; $i < $toDelete; $i++) {
+        unlink($files[$i]);
+        echo "[-] Rotation: Deleted old backup " . basename($files[$i]) . "\n";
     }
-    
-} else {
-    echo "Backup gagal. Pastikan mysqldump terinstall dan konfigurasi benar.\n";
 }
