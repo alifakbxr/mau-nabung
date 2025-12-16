@@ -68,6 +68,7 @@ class TransactionController {
         $data = [
             'category_id' => $_POST['category_id'],
             'account_id' => $_POST['account_id'],
+            'related_account_id' => $_POST['related_account_id'] ?? null,
             'amount' => $_POST['amount'],
             'type' => $_POST['type'],
             'description' => $_POST['description'],
@@ -121,6 +122,7 @@ class TransactionController {
         $data = [
             'category_id' => $_POST['category_id'],
             'account_id' => $_POST['account_id'],
+            'related_account_id' => $_POST['related_account_id'] ?? null,
             'amount' => $_POST['amount'],
             'type' => $_POST['type'],
             'description' => $_POST['description'],

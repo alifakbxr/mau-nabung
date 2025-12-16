@@ -80,8 +80,9 @@ CREATE TABLE IF NOT EXISTS `transactions` (
   `user_id` int(11) NOT NULL,
   `category_id` int(11) DEFAULT NULL,
   `account_id` int(11) DEFAULT NULL,
+  `related_account_id` int(11) DEFAULT NULL,
   `amount` decimal(15,2) NOT NULL,
-  `type` enum('income','expense') NOT NULL,
+  `type` enum('income','expense','transfer','adjustment') NOT NULL,
   `description` text,
   `transaction_date` date NOT NULL,
   `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -90,9 +91,11 @@ CREATE TABLE IF NOT EXISTS `transactions` (
   KEY `user_id` (`user_id`),
   KEY `category_id` (`category_id`),
   KEY `account_id` (`account_id`),
+  KEY `related_account_id` (`related_account_id`),
   CONSTRAINT `fk_transactions_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_transactions_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `fk_transactions_account` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL
+  CONSTRAINT `fk_transactions_account` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_transactions_related_account` FOREIGN KEY (`related_account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -151,7 +154,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `type` enum('cash','bank','ewallet','investment') NOT NULL,
+  `type` enum('cash','bank','ewallet','investment','credit_card','loan') NOT NULL,
   `balance` decimal(15,2) DEFAULT 0.00,
   `is_default` tinyint(1) DEFAULT 0,
   `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -213,4 +216,10 @@ COMMIT;
 -- Manual ALTERs for existing installations (Run these if tables already exist)
 -- ALTER TABLE `transactions` ADD COLUMN `account_id` INT DEFAULT NULL AFTER `user_id`;
 -- ALTER TABLE `transactions` ADD CONSTRAINT `fk_transactions_account` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL;
+
+-- NEW MIGRATIONS FOR TRANSFERS & COMPLIANCE
+-- ALTER TABLE `transactions` MODIFY COLUMN `type` ENUM('income','expense','transfer','adjustment') NOT NULL;
+-- ALTER TABLE `transactions` ADD COLUMN `related_account_id` INT DEFAULT NULL AFTER `account_id`;
+-- ALTER TABLE `transactions` ADD CONSTRAINT `fk_transactions_related_account` FOREIGN KEY (`related_account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL;
+-- ALTER TABLE `accounts` MODIFY COLUMN `type` ENUM('cash','bank','ewallet','investment','credit_card','loan') NOT NULL;
 
