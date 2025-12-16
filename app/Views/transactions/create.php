@@ -8,6 +8,7 @@
             </div>
             <div class="card-body">
                 <form action="<?= base_url('/transactions/store') ?>" method="POST">
+                    <?= csrf_field() ?>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label">Tipe Transaksi</label>
@@ -37,6 +38,19 @@
                         </select>
                         <div class="form-text">
                             <a href="<?= base_url('/categories') ?>" class="text-decoration-none">Kelola Kategori</a>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Akun / Dompet</label>
+                        <select name="account_id" class="form-select" required>
+                            <option value="">Pilih Akun</option>
+                            <?php foreach ($accounts as $acc): ?>
+                                <option value="<?= $acc['id'] ?>"><?= $acc['name'] ?> (<?= $acc['type'] ?>)</option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="form-text">
+                            <a href="<?= base_url('/accounts') ?>" class="text-decoration-none">Kelola Akun</a>
                         </div>
                     </div>
 

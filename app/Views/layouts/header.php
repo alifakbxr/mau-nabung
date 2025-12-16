@@ -39,6 +39,12 @@
             <a href="<?= base_url('/transactions') ?>" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/transactions') !== false ? 'active' : '' ?>">
                 <i class="fas fa-exchange-alt"></i> Transaksi
             </a>
+            <a href="<?= base_url('/accounts') ?>" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/accounts') !== false ? 'active' : '' ?>">
+                <i class="fas fa-wallet"></i> Dompet
+            </a>
+            <a href="<?= base_url('/goals') ?>" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/goals') !== false ? 'active' : '' ?>">
+                <i class="fas fa-bullseye"></i> Target
+            </a>
             <a href="<?= base_url('/categories') ?>" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/categories') !== false ? 'active' : '' ?>">
                 <i class="fas fa-tags"></i> Kategori
             </a>

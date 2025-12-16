@@ -8,9 +8,10 @@ class Transaction extends Model {
     protected $table = 'transactions';
 
     public function getByUser($userId, $limit = null, $filters = []) {
-        $sql = "SELECT t.*, c.name as category_name, c.color as category_color 
+        $sql = "SELECT t.*, c.name as category_name, c.color as category_color, a.name as account_name 
                 FROM transactions t 
                 LEFT JOIN categories c ON t.category_id = c.id 
+                LEFT JOIN accounts a ON t.account_id = a.id
                 WHERE t.user_id = :user_id";
         
         $params = ['user_id' => $userId];
@@ -40,10 +41,11 @@ class Transaction extends Model {
     }
 
     public function create($data) {
-        $stmt = $this->db->prepare("INSERT INTO transactions (user_id, category_id, amount, type, description, transaction_date) VALUES (:user_id, :category_id, :amount, :type, :description, :transaction_date)");
+        $stmt = $this->db->prepare("INSERT INTO transactions (user_id, category_id, account_id, amount, type, description, transaction_date) VALUES (:user_id, :category_id, :account_id, :amount, :type, :description, :transaction_date)");
         return $stmt->execute([
             'user_id' => $data['user_id'],
             'category_id' => $data['category_id'] ?: null,
+            'account_id' => $data['account_id'] ?: null,
             'amount' => $data['amount'],
             'type' => $data['type'],
             'description' => $data['description'],
@@ -52,9 +54,10 @@ class Transaction extends Model {
     }
 
     public function update($id, $data) {
-        $stmt = $this->db->prepare("UPDATE transactions SET category_id = :category_id, amount = :amount, type = :type, description = :description, transaction_date = :transaction_date WHERE id = :id AND user_id = :user_id");
+        $stmt = $this->db->prepare("UPDATE transactions SET category_id = :category_id, account_id = :account_id, amount = :amount, type = :type, description = :description, transaction_date = :transaction_date WHERE id = :id AND user_id = :user_id");
         return $stmt->execute([
             'category_id' => $data['category_id'] ?: null,
+            'account_id' => $data['account_id'] ?: null,
             'amount' => $data['amount'],
             'type' => $data['type'],
             'description' => $data['description'],

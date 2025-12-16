@@ -8,6 +8,7 @@
             </div>
             <div class="card-body">
                 <form action="<?= base_url('/transactions/update') ?>" method="POST">
+                    <?= csrf_field() ?>
                     <input type="hidden" name="id" value="<?= $transaction['id'] ?>">
                     
                     <div class="row mb-3">
@@ -36,6 +37,18 @@
                             <?php foreach ($categories as $cat): ?>
                                 <option value="<?= $cat['id'] ?>" <?= $transaction['category_id'] == $cat['id'] ? 'selected' : '' ?>>
                                     <?= $cat['name'] ?> (<?= $cat['type'] == 'income' ? 'Pemasukan' : 'Pengeluaran' ?>)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Akun / Dompet</label>
+                        <select name="account_id" class="form-select" required>
+                            <option value="">Pilih Akun</option>
+                            <?php foreach ($accounts as $acc): ?>
+                                <option value="<?= $acc['id'] ?>" <?= isset($transaction['account_id']) && $transaction['account_id'] == $acc['id'] ? 'selected' : '' ?>>
+                                    <?= $acc['name'] ?> (<?= $acc['type'] ?>)
                                 </option>
                             <?php endforeach; ?>
                         </select>

@@ -31,6 +31,15 @@ function base_url($path = '') {
     return $base . '/' . ltrim($path, '/');
 }
 
+function csrf_field() {
+    $token = \App\Core\Security::generateCsrfToken();
+    return '<input type="hidden" name="csrf_token" value="' . $token . '">';
+}
+
+function esc($string) {
+    return \App\Core\Security::esc($string);
+}
+
 // Define Routes
 // Auth
 $router->add('GET', '/', 'AuthController', 'login');
@@ -55,6 +64,19 @@ $router->add('POST', '/transactions/delete', 'TransactionController', 'delete');
 $router->add('GET', '/categories', 'CategoryController', 'index');
 $router->add('POST', '/categories/store', 'CategoryController', 'store');
 $router->add('POST', '/categories/delete', 'CategoryController', 'delete');
+
+
+// Accounts
+$router->add('GET', '/accounts', 'AccountController', 'index');
+$router->add('GET', '/accounts/create', 'AccountController', 'create');
+$router->add('POST', '/accounts/store', 'AccountController', 'store');
+$router->add('POST', '/accounts/delete', 'AccountController', 'delete');
+
+// Goals
+$router->add('GET', '/goals', 'SavingsGoalController', 'index');
+$router->add('GET', '/goals/create', 'SavingsGoalController', 'create');
+$router->add('POST', '/goals/store', 'SavingsGoalController', 'store');
+$router->add('POST', '/goals/delete', 'SavingsGoalController', 'delete');
 
 // Reports
 $router->add('GET', '/reports', 'ReportController', 'index');

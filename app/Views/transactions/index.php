@@ -75,6 +75,7 @@
                                 <td class="text-end pe-4">
                                     <a href="<?= base_url('/transactions/edit?id=' . $t['id']) ?>" class="btn btn-sm btn-light text-primary me-1"><i class="fas fa-edit"></i></a>
                                     <form action="<?= base_url('/transactions/delete') ?>" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus?');">
+                                        <?= csrf_field() ?>
                                         <input type="hidden" name="id" value="<?= $t['id'] ?>">
                                         <button type="submit" class="btn btn-sm btn-light text-danger"><i class="fas fa-trash"></i></button>
                                     </form>

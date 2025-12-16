@@ -11,68 +11,109 @@
 </div>
 
 <!-- Stats Cards -->
-<div class="row g-4 mb-5">
-    <div class="col-md-4">
-        <div class="card border-0 h-100 stat-card-wrapper">
-            <div class="card-body">
-                <div class="d-flex align-items-start justify-content-between mb-3">
-                    <div>
-                        <p class="text-secondary fw-medium mb-1">Pemasukan</p>
-                        <h3 class="fw-bold text-dark mb-0"><?= $_SESSION['currency'] ?> <?= number_format($totals['total_income'] ?? 0, 0, ',', '.') ?></h3>
-                    </div>
-                    <div class="stat-icon bg-soft-success">
-                        <i class="fas fa-arrow-down"></i>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center text-sm">
-                    <span class="badge bg-soft-success text-success rounded-pill px-2 py-1">
-                        <i class="fas fa-arrow-up me-1"></i> +0%
-                    </span>
-                    <span class="text-muted ms-2 small">dari bulan lalu</span>
-                </div>
+
+<!-- Net Worth & Overview -->
+<div class="row g-4 mb-4">
+    <!-- Total Net Worth Card -->
+    <div class="col-md-12">
+        <div class="card border-0 bg-primary text-white shadow-sm overflow-hidden position-relative">
+            <div class="card-body p-4 position-relative z-1">
+                <p class="mb-1 text-white-50">Total Kekayaan Bersih (Net Worth)</p>
+                <h1 class="fw-bold mb-0"><?= $_SESSION['currency'] ?> <?= number_format($netWorth ?? 0, 0, ',', '.') ?></h1>
             </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card border-0 h-100 stat-card-wrapper">
-            <div class="card-body">
-                <div class="d-flex align-items-start justify-content-between mb-3">
-                    <div>
-                        <p class="text-secondary fw-medium mb-1">Pengeluaran</p>
-                        <h3 class="fw-bold text-dark mb-0"><?= $_SESSION['currency'] ?> <?= number_format($totals['total_expense'] ?? 0, 0, ',', '.') ?></h3>
-                    </div>
-                    <div class="stat-icon bg-soft-danger">
-                        <i class="fas fa-arrow-up"></i>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center text-sm">
-                    <span class="badge bg-soft-danger text-danger rounded-pill px-2 py-1">
-                        <i class="fas fa-arrow-up me-1"></i> +0%
-                    </span>
-                    <span class="text-muted ms-2 small">dari bulan lalu</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card border-0 h-100 stat-card-wrapper">
-            <div class="card-body">
-                <div class="d-flex align-items-start justify-content-between mb-3">
-                    <div>
-                        <p class="text-secondary fw-medium mb-1">Saldo Bulan Ini</p>
-                        <h3 class="fw-bold text-dark mb-0"><?= $_SESSION['currency'] ?> <?= number_format(($totals['total_income'] ?? 0) - ($totals['total_expense'] ?? 0), 0, ',', '.') ?></h3>
-                    </div>
-                    <div class="stat-icon bg-soft-primary">
-                        <i class="fas fa-wallet"></i>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center text-sm">
-                    <span class="text-muted small">Total akumulasi aset lancar</span>
-                </div>
-            </div>
+            <i class="fas fa-wallet position-absolute opacity-25" style="font-size: 10rem; right: -2rem; bottom: -2rem; transform: rotate(-15deg);"></i>
         </div>
     </div>
 </div>
+
+<div class="row g-4 mb-5">
+    <!-- Quick Accounts Preview -->
+    <div class="col-md-8">
+        <div class="card border-0 h-100 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold">Dompet & Akun Saya</h6>
+                <a href="<?= base_url('/accounts') ?>" class="btn btn-sm btn-light text-primary">Kelola</a>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <?php if (!empty($accounts)): ?>
+                        <?php foreach (array_slice($accounts, 0, 4) as $acc): ?>
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded bg-light d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="text-muted d-block"><?= htmlspecialchars($acc['name']) ?></small>
+                                    <span class="fw-bold"><?= number_format($acc['balance'], 0, ',', '.') ?></span>
+                                </div>
+                                <i class="fas <?= $acc['type'] == 'cash' ? 'fa-money-bill-wave' : ($acc['type'] == 'bank' ? 'fa-university' : 'fa-mobile-alt') ?> text-secondary opacity-50"></i>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="col-12 text-center text-muted py-3">Belum ada akun.</div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Cashflow Summary -->
+    <div class="col-md-4">
+         <div class="card border-0 h-100 shadow-sm">
+            <div class="card-header bg-white text-center">
+                <h6 class="mb-0 fw-bold">Cashflow Bulan Ini</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                    <span class="text-muted">Masuk</span>
+                    <span class="text-success fw-bold">+ <?= number_format($totals['total_income'] ?? 0, 0, ',', '.') ?></span>
+                </div>
+                <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                    <span class="text-muted">Keluar</span>
+                    <span class="text-danger fw-bold">- <?= number_format($totals['total_expense'] ?? 0, 0, ',', '.') ?></span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="fw-bold">Selisih</span>
+                    <?php $diff = ($totals['total_income'] ?? 0) - ($totals['total_expense'] ?? 0); ?>
+                    <span class="fw-bold <?= $diff >= 0 ? 'text-primary' : 'text-danger' ?>">
+                        <?= number_format($diff, 0, ',', '.') ?>
+                    </span>
+                </div>
+            </div>
+         </div>
+    </div>
+</div>
+
+<!-- Savings Goals Preview -->
+<?php if (!empty($goals)): ?>
+<div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">Target Tabungan</h5>
+        <a href="<?= base_url('/goals') ?>" class="text-decoration-none">Lihat Semua</a>
+    </div>
+    <div class="row g-3">
+        <?php foreach (array_slice($goals, 0, 3) as $goal): 
+              $percentage = $goal['target_amount'] > 0 ? ($goal['current_amount'] / $goal['target_amount']) * 100 : 0;
+        ?>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="fw-bold small"><?= htmlspecialchars($goal['name']) ?></span>
+                        <span class="small text-muted"><?= number_format($percentage, 0) ?>%</span>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar rounded-pill" style="width: <?= $percentage ?>%; background-color: <?= $goal['color'] ?>"></div>
+                    </div>
+                    <div class="mt-2 text-end small text-muted">
+                        <?= number_format($goal['current_amount'], 0, ',', '.') ?> / <?= number_format($goal['target_amount'], 0, ',', '.') ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+<?php endif; ?>
 
 <div class="row g-4">
     <!-- Charts -->
