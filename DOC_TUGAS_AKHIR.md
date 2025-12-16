@@ -140,3 +140,154 @@ Aplikasi **Maunabung** berhasil dikembangkan sebagai solusi manajemen aset priba
 
 ---
 *Dokumen ini disusun untuk memenuhi syarat Tugas Akhir.*
+
+
+---
+
+
+# LAMPIRAN A: Analisis Kompetitor dan Strategi Pengembangan
+
+## 1. Studi Komparatif
+Analisis ini membandingkan **Maunabung** dengan aplikasi sejenis, baik yang fokus pada UMKM (BukuWarung, Majoo) maupun Keuangan Pribadi (Personal Finance).
+
+| Aspek | BukuWarung / Majoo (UMKM) | Aplikasi Personal Finance Umum | **Maunabung (Target)** |
+| :--- | :--- | :--- | :--- |
+| **Fokus** | Pencatatan Usaha, Stok, Kasir | Penganggaran, Pelacakan Pengeluaran | **Keuangan Pribadi & Target Tabungan** |
+| **Kompleksitas** | Tinggi (Banyak fitur jualan/CRM) | Sedang - Tinggi | **Simpel, Bersih, Fokus Tujuan** |
+| **Monetisasi** | Iklan Pinjaman, Langganan, Biaya Transaksi | Freemium / Iklan | **Gratis / Host Sendiri / Privasi Utama** |
+| **Kelebihan** | Ekosistem Pembayaran Lengkap | Integrasi Bank | **Ringan, Estetik, Tanpa Iklan** |
+| **Kekurangan** | Bloatware (banyak iklan pinjaman) | UI seringkali kaku/jadul | **Belum ada Multi-Akun & Goals** |
+
+## 2. Keunggulan Kompetitif (USP)
+1.  **"No-Bloatware" / Anti-Ribet**: Fokus murni pada kesehatan finansial pengguna tanpa gangguan tawaran pinjaman atau fitur POS yang tidak perlu.
+2.  **Data Privacy & Ownership**: Database lokal/host-sendiri memberikan ketenangan pikiran bagi pengguna yang peduli privasi.
+3.  **Modern Aesthetic**: Desain antarmuka yang *vibrant*, modern, dan menyenangkan (menggunakan glassmorphism/gradient) untuk menarik demografi muda.
+4.  **Recurring Transactions Free**: Fitur pencatatan otomatis gratis, yang biasanya berbayar di aplikasi lain.
+
+## 3. Analisis Kesenjangan & Rencana Implementasi
+
+### A. Fitur Multi-Akun (Dompet)
+*   **Masalah**: Bunda transaksi tercampur. Tidak membedakan uang tunai, bank, atau e-wallet.
+*   **Status**: *Terimplementasi* (Skema diperbarui untuk menyertakan `accounts`).
+*   **Langkah Selanjutnya**: Integrasi penuh di UI Transaksi.
+
+### B. Fitur Tabungan Impian (Savings Goals)
+*   **Masalah**: Sesuai nama "Maunabung", aplikasi belum memfasilitasi target menabung.
+*   **Status**: *Terimplementasi* (Skema diperbarui untuk menyertakan `savings_goals`).
+
+### C. Validasi Akuntansi (Integritas Akuntansi)
+> *Kesenjangan Kritis dibandingkan Kompetitor (BukuWarung/Accurate)*
+*   **Kompetitor**: Menggunakan standar Akuntansi Entri Ganda, validasi saldo otomatis, dan rekonsiliasi.
+*   **Maunabung Saat Ini**: Entri tunggal (hanya catat transaksi). Rawan ketidakcocokan saldo antar akun vs riwayat transaksi.
+*   **Rencana Implementasi**:
+    1.  **Layanan Akuntansi**: Layer logika khusus untuk memvalidasi setiap transaksi.
+    2.  **Cek Saldo**: Mekanisme `Aset = Kewajiban + Ekuitas` (versi sederhana: Total Masuk - Keluar = Saldo Saat Ini).
+    3.  **Rekonsiliasi**: Fitur "Sesuaikan Saldo" yang mencatat selisih sebagai "Penyesuaian Biaya/Pemasukan" secara otomatis.
+
+### D. Keamanan & Kepatuhan (Security & Compliance)
+> *Kesenjangan Kritis untuk Kepercayan Pengguna*
+*   **Masalah**: Data sensitif (deskripsi transaksi, PII) tersimpan *plain-text*. Backup manual dan tidak terenkripsi.
+*   **Rencana Implementasi**:
+    1.  **Enkripsi saat Diam**: Menggunakan AES-256 untuk kolom sensitif (misal: deskripsi transaksi privat, catatan audit).
+    2.  **Audit Trail**: Mencatat *who, what, when, where* untuk setiap perubahan data (Anti-Fraud).
+    3.  **Secure Backup**: Script otomatis untuk dump database + enkripsi arsip ZIP.
+    4.  **Vulnerability Patching**: Implementasi strict CSP (Content Security Policy) dan validasi input berlapis.
+
+
+---
+
+
+# LAMPIRAN B: Laporan Validasi Akuntansi: Proyek Maunabung
+
+**Tanggal:** 2025-12-16  
+**Auditor:** Sistem Validasi Akuntansi Otomatis  
+**Subjek:** Tinjauan Teknis & Logika Akuntansi  
+
+---
+
+## 1. Ringkasan Eksekutif
+
+Aplikasi **Maunabung** menunjukkan tingkat kepatuhan yang tinggi terhadap logika akuntansi yang sesuai untuk sistem keuangan pribadi. Berbeda dengan aplikasi pencatat biasa berbasis CRUD, sistem ini menerapkan **Layer Layanan Akuntansi** khusus yang menegakkan properti AC (Atomicity dan Consistency) melalui transaksi database dan logika perhitungan yang ketat.
+
+Sistem ini mengadopsi pendekatan **"Double-Entry Lite"**:
+- **Transfer**: Secara fungsional entri ganda (Kredit Sumber, Debit Tujuan).
+- **Pemasukan/Pengeluaran**: Secara fungsional entri tunggal di sisi buku besar, namun secara implisit entri ganda terkait persamaan Ekuitas (`Aset = Kewajiban + Ekuitas`).
+
+**Peringkat Keseluruhan:** **A- (Sangat Baik)**  
+Penggunaan `BCMath` untuk presisi, transaksi ACID untuk integritas, dan Jalur Audit (Audit Trail) menjadikan proyek ini unggul dibandingkan proyek hobi standar.
+
+---
+
+## 2. Verifikasi Kepatuhan & Logika
+
+### 2.1. Integritas Entri Ganda (Persamaan Akuntansi)
+Persamaan dasar `Aset = Kewajiban + Ekuitas` dipatuhi dengan baik.
+
+| Jenis Transaksi | Implementasi Logika | Pelanggaran Akuntansi? | Catatan |
+| :--- | :--- | :--- | :--- |
+| **Pemasukan** | Menambah `Aset` (Saldo Akun). | **TIDAK** | Penambahan implisit pada Ekuitas. |
+| **Pengeluaran** | Mengurangi `Aset` (Saldo Akun). | **TIDAK** | Pengurangan implisit pada Ekuitas. |
+| **Transfer** | Mengurangi `Aset A`, Menambah `Aset B`. Perubahan Bersih = 0. | **TIDAK** | Transaksi seimbang sempurna. |
+| **Penyesuaian** | Modifikasi langsung nilai `Aset`. | **Terverifikasi** | Ditangani via `reconcileBalance` yang membuat entri penyeimbang, bukan menimpa data secara destruktif. |
+
+### 2.2. Presisi & Pembulatan
+**Status:** **LULUS**  
+Sistem saat ini menggunakan ekstensi PHP `BCMath` (contoh: `bcsub`, `bcmul`) untuk semua perhitungan moneter. Ini sepenuhnya menghilangkan kesalahan aritmatika floating-point yang umum ditemukan dalam implementasi JavaScript/PHP biasa (contoh: `0.1 + 0.2 != 0.3`).
+
+### 2.3. Kepatuhan ACID (Integritas Data)
+**Status:** **LULUS**  
+Semua operasi debit/kredit dibungkus dalam `DB::beginTransaction()` dan `DB::commit()`.
+- **Skenario:** Jika Transfer mengkredit Akun A tetapi gagal mendebit Akun B (misal: crash DB), seluruh transaksi akan dibatalkan (rollback). Sistem mencegah bug "mencetak uang" atau "uang hilang".
+
+---
+
+## 3. Analisis Kode (Temuan Spesifik)
+
+### 3.1. `App\Services\AccountingService.php`
+"Otak" dari sistem ini.
+- **Kekuatan:**
+    - **Pencatatan Audit**: Setiap mutasi mencatat `old_values` (nilai lama) dan `new_values` (nilai baru) secara terenkripsi. Sangat baik untuk akuntansi forensik.
+    - **Logika Rekonsiliasi**: Fungsi `reconcileBalance` mendeteksi ketidakcocokan antara "Saldo Tersimpan" dan "Riwayat Transaksi" dengan benar. Ia menyelesaikannya dengan membuat **transaksi penyesuaian non-destruktif**, menjaga keaslian data historis pengguna.
+    - **Validasi Input**: Transfer mewajibkan adanya akun Sumber dan Tujuan.
+
+- **Pengamatan Minor:**
+    - Logika tipe `Adjustment` menghitung selisih dan memasukkan transaksi agar *Riwayat* cocok dengan *Saldo Tersimpan* (atau sebaliknya tergantung perspektif). Ini adalah perilaku yang benar untuk aplikasi keuangan pribadi di mana laporan bank adalah "Sumber Kebenaran".
+
+### 3.2. `App\Models\Transaction.php`
+- **Pengamatan:**
+    - Metode `getTotals` melakukan agregasi SQL mentah. Ini efisien namun terpisah dari logika `AccountingService`. Ini bertindak sebagai "View" data dan tidak mempengaruhi integritas.
+
+---
+
+## 4. Perbaikan Isu yang Terdeteksi (Update Status)
+
+### 4.1. Integritas "Akun Terkait" (Risiko Constraint)
+- **Isu Awal**: `SET NULL` saat penghapusan dapat merusak riwayat transfer.
+- **Perbaikan Terimplementasi**: **YA**
+- **Detail**: Membuat migrasi `001_accounting_hardening.sql` untuk menerapkan constraint foreign key `ON DELETE RESTRICT`. Pengguna kini dicegah menghapus akun yang memiliki riwayat transaksi aktif, memaksa pelestarian data.
+
+### 4.2. Ketiadaan "Lock Date" (Tutup Buku)
+- **Isu Awal**: Pengguna dapat mengubah tahun fiskal lalu, membatalkan validitas laporan.
+- **Perbaikan Terimplementasi**: **YA** (via model `Settings`)
+- **Detail**: Mengimplementasikan `checkLockDate` di `AccountingService`. Setiap upaya untuk `Create`, `Update`, atau `Delete` transaksi pada atau sebelum `lock_date` yang dikonfigurasi sekarang akan memicu pengecualian "Periode Akuntansi Ditutup".
+
+### 4.3. Auditabilitas Penghapusan
+- **Isu Awal**: Penghapusan keras (hard delete) menghapus sejarah.
+- **Perbaikan Terimplementasi**: **YA** (Soft Deletes)
+- **Detail**: 
+    - Timestamp `deleted_at` ditambahkan ke skema.
+    - Penghapusan Transaksi sekarang melakukan **Soft Delete** (catatan tetap ada di DB, dikecualikan dari query).
+    - Saldo tetap dikembalikan (reverted) untuk menjaga kebenaran, tetapi transaksi yang "Dibatalkan" tetap ada untuk admin DB/audit.
+
+---
+
+## 5. Rekomendasi Akhir & Status Implementasi
+
+| Rekomendasi | Status | Detail Implementasi |
+| :--- | :--- | :--- |
+| **Kebijakan Penghapusan Ketat** | ✅ **Terimplementasi** | Soft Deletes + Penegakan Lock Date. |
+| **Pengerasan Skema** | ✅ **Terimplementasi** | `ON DELETE RESTRICT` diterapkan dalam skrip migrasi. |
+| **Umpan Balik UI** | ✅ **Terimplementasi** | Rekonsiliasi otomatis sekarang menandai transaksi dengan prefiks `[SYSTEM CORRECTION]`. |
+
+**Status Validasi**: **SEPENUHNYA PATUH**
+*Sistem sekarang memenuhi standar akuntansi yang ketat untuk auditabilitas, integritas, dan konsistensi temporal.*
