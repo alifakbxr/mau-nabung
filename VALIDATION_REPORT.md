@@ -1,94 +1,94 @@
-# Accounting Validation Report: Maunabung Project
+# Laporan Validasi Akuntansi: Proyek Maunabung
 
-**Date:** 2025-12-16  
-**Auditor:** Automated Accounting Validation System  
-**Subject:** Technical & Accounting Logic Review  
-
----
-
-## 1. Executive Summary
-
-The **Maunabung** application demonstrates a high level of compliance with accounting logic suitable for a personal finance system. Unlike typical CRUD-based ledger apps, it implements a dedicated **Accounting Service Layer** that enforces AC properties (Atomicity and Consistency) through database transactions and strict calculation logic.
-
-The system adopts a **"Double-Entry Lite"** approach:
-- **Transfers**: Functionally double-entry (Credit Source, Debit Destination).
-- **Income/Expense**: Functionally single-entry on the ledger side, but implicitly double-entry regarding the Equity equation (`Assets = Liabilities + Equity`).
-
-**Overall Rating:** **A- (Excellent)**  
-The use of `BCMath` for precision, ACID transactions for integrity, and an Audit Audit trail sets this project apart from standard hobbyist projects.
+**Tanggal:** 2025-12-16  
+**Auditor:** Sistem Validasi Akuntansi Otomatis  
+**Subjek:** Tinjauan Teknis & Logika Akuntansi  
 
 ---
 
-## 2. Compliance & Logic Verification
+## 1. Ringkasan Eksekutif
 
-### 2.1. Double-Entry Integrity (The Accounting Equation)
-The fundamental equation `Assets = Liabilities + Equity` is respected.
+Aplikasi **Maunabung** menunjukkan tingkat kepatuhan yang tinggi terhadap logika akuntansi yang sesuai untuk sistem keuangan pribadi. Berbeda dengan aplikasi pencatat biasa berbasis CRUD, sistem ini menerapkan **Layer Layanan Akuntansi** khusus yang menegakkan properti AC (Atomicity dan Consistency) melalui transaksi database dan logika perhitungan yang ketat.
 
-| Transaction Type | Logic Implementation | Accounting Violation? | Notes |
+Sistem ini mengadopsi pendekatan **"Double-Entry Lite"**:
+- **Transfer**: Secara fungsional entri ganda (Kredit Sumber, Debit Tujuan).
+- **Pemasukan/Pengeluaran**: Secara fungsional entri tunggal di sisi buku besar, namun secara implisit entri ganda terkait persamaan Ekuitas (`Aset = Kewajiban + Ekuitas`).
+
+**Peringkat Keseluruhan:** **A- (Sangat Baik)**  
+Penggunaan `BCMath` untuk presisi, transaksi ACID untuk integritas, dan Jalur Audit (Audit Trail) menjadikan proyek ini unggul dibandingkan proyek hobi standar.
+
+---
+
+## 2. Verifikasi Kepatuhan & Logika
+
+### 2.1. Integritas Entri Ganda (Persamaan Akuntansi)
+Persamaan dasar `Aset = Kewajiban + Ekuitas` dipatuhi dengan baik.
+
+| Jenis Transaksi | Implementasi Logika | Pelanggaran Akuntansi? | Catatan |
 | :--- | :--- | :--- | :--- |
-| **Income** | Increases `Asset` (Account Balance). | **NO** | Implicit increase in Equity. |
-| **Expense** | Decreases `Asset` (Account Balance). | **NO** | Implicit decrease in Equity. |
-| **Transfer** | Decreases `Asset A`, Increases `Asset B`. Net Change = 0. | **NO** | Perfectly balanced transaction. |
-| **Adjustment** | Direct modification of `Asset` value. | **Checked** | Handled via `reconcileBalance` creating a counter-adjusting entry rather than a destructive overwrite. |
+| **Pemasukan** | Menambah `Aset` (Saldo Akun). | **TIDAK** | Penambahan implisit pada Ekuitas. |
+| **Pengeluaran** | Mengurangi `Aset` (Saldo Akun). | **TIDAK** | Pengurangan implisit pada Ekuitas. |
+| **Transfer** | Mengurangi `Aset A`, Menambah `Aset B`. Perubahan Bersih = 0. | **TIDAK** | Transaksi seimbang sempurna. |
+| **Penyesuaian** | Modifikasi langsung nilai `Aset`. | **Terverifikasi** | Ditangani via `reconcileBalance` yang membuat entri penyeimbang, bukan menimpa data secara destruktif. |
 
-### 2.2. Precision & Rounding
-**Status:** **PASSED**  
-The system currently uses PHP's `BCMath` extension (e.g., `bcsub`, `bcmul`) for all monetary calculations. This completely eliminates floating-point arithmetic errors commonly found in JavaScript/PHP implementations (e.g., `0.1 + 0.2 != 0.3`).
+### 2.2. Presisi & Pembulatan
+**Status:** **LULUS**  
+Sistem saat ini menggunakan ekstensi PHP `BCMath` (contoh: `bcsub`, `bcmul`) untuk semua perhitungan moneter. Ini sepenuhnya menghilangkan kesalahan aritmatika floating-point yang umum ditemukan dalam implementasi JavaScript/PHP biasa (contoh: `0.1 + 0.2 != 0.3`).
 
-### 2.3. ACID Compliance (Data Integrity)
-**Status:** **PASSED**  
-All debit/credit operations are wrapped in `DB::beginTransaction()` and `DB::commit()`.
-- **Scenario:** If a Transfer credits Account A but fails to debit Account B (e.g., DB crash), the entire transaction rolls back. System prevents "money printing" or "money voiding" bugs.
+### 2.3. Kepatuhan ACID (Integritas Data)
+**Status:** **LULUS**  
+Semua operasi debit/kredit dibungkus dalam `DB::beginTransaction()` dan `DB::commit()`.
+- **Skenario:** Jika Transfer mengkredit Akun A tetapi gagal mendebit Akun B (misal: crash DB), seluruh transaksi akan dibatalkan (rollback). Sistem mencegah bug "mencetak uang" atau "uang hilang".
 
 ---
 
-## 3. Codebase Analysis (Specific Findings)
+## 3. Analisis Kode (Temuan Spesifik)
 
 ### 3.1. `App\Services\AccountingService.php`
-The "Brain" of the system.
-- **Strengths:**
-    - **Audit Logging**: Every mutation logs `old_values` and `new_values` (encrypted). Excellent for forensic accounting.
-    - **Reconciliation Logic**: The `reconcileBalance` function (Lines 135-246) correctly detects discrepancies between "Stored Balance" and "Transaction History". It resolves them by creating a **non-destructive adjustment transaction**, preserving the immutability of historical user data.
-    - **Input Validation**: Transfers require both Source and Destination accounts (Lines 44-46).
+"Otak" dari sistem ini.
+- **Kekuatan:**
+    - **Pencatatan Audit**: Setiap mutasi mencatat `old_values` (nilai lama) dan `new_values` (nilai baru) secara terenkripsi. Sangat baik untuk akuntansi forensik.
+    - **Logika Rekonsiliasi**: Fungsi `reconcileBalance` mendeteksi ketidakcocokan antara "Saldo Tersimpan" dan "Riwayat Transaksi" dengan benar. Ia menyelesaikannya dengan membuat **transaksi penyesuaian non-destruktif**, menjaga keaslian data historis pengguna.
+    - **Validasi Input**: Transfer mewajibkan adanya akun Sumber dan Tujuan.
 
-- **Minor Observations:**
-    - The `Adjustment` type logic implies that if `Actual Transaction Sum != Stored Balance`, the implementation assumes the *Stored Balance* is incorrect? No, looking closely at lines 202-230, it calculates the difference and inserts a transaction to make the *History* match the *Stored Balance* (or vice versa depending on perspective). The implementation calculates `Diff = Actual - Calculated` and inserts that Diff. This effectively forces the **History** to align with the **User's Claimed Balance** (Actual). This is the correct behavior for a personal finance app where the bank statement is the "Source of Truth".
+- **Pengamatan Minor:**
+    - Logika tipe `Adjustment` menghitung selisih dan memasukkan transaksi agar *Riwayat* cocok dengan *Saldo Tersimpan* (atau sebaliknya tergantung perspektif). Ini adalah perilaku yang benar untuk aplikasi keuangan pribadi di mana laporan bank adalah "Sumber Kebenaran".
 
 ### 3.2. `App\Models\Transaction.php`
-- **Observations:**
-    - The `getTotals` method (Lines 88-102) performs a raw SQL aggregation. This is efficient but separate from the `AccountingService` logic. It acts as a "View" of the data and does not affect integrity.
+- **Pengamatan:**
+    - Metode `getTotals` melakukan agregasi SQL mentah. Ini efisien namun terpisah dari logika `AccountingService`. Ini bertindak sebagai "View" data dan tidak mempengaruhi integritas.
 
 ---
 
-## 4. Remediation of Detected Issues (Status Update)
+## 4. Perbaikan Isu yang Terdeteksi (Update Status)
 
-### 4.1. "Related Account" Integrity (Constraint Risk)
-- **Original Issue**: `SET NULL` on delete could corrupt transfer history.
-- **Remediation Implemented**: **YES**
-- **Details**: Created migration `001_accounting_hardening.sql` to apply `ON DELETE RESTRICT` foreign key constraints. Users are now prevented from deleting accounts that have active transaction history, forcing data preservation.
+### 4.1. Integritas "Akun Terkait" (Risiko Constraint)
+- **Isu Awal**: `SET NULL` saat penghapusan dapat merusak riwayat transfer.
+- **Perbaikan Terimplementasi**: **YA**
+- **Detail**: Membuat migrasi `001_accounting_hardening.sql` untuk menerapkan constraint foreign key `ON DELETE RESTRICT`. Pengguna kini dicegah menghapus akun yang memiliki riwayat transaksi aktif, memaksa pelestarian data.
 
-### 4.2. Lack of "Lock Date" (Closing Books)
-- **Original Issue**: Users could modify past fiscal years, invalidating reports.
-- **Remediation Implemented**: **YES** (via `Settings` model)
-- **Details**: Implemented `checkLockDate` in `AccountingService`. Any attempt to `Create`, `Update`, or `Delete` a transaction on or before the configured `lock_date` now throws a `Accounting Period Closed` exception.
+### 4.2. Ketiadaan "Lock Date" (Tutup Buku)
+- **Isu Awal**: Pengguna dapat mengubah tahun fiskal lalu, membatalkan validitas laporan.
+- **Perbaikan Terimplementasi**: **YA** (via model `Settings`)
+- **Detail**: Mengimplementasikan `checkLockDate` di `AccountingService`. Setiap upaya untuk `Create`, `Update`, atau `Delete` transaksi pada atau sebelum `lock_date` yang dikonfigurasi sekarang akan memicu pengecualian "Periode Akuntansi Ditutup".
 
-### 4.3. Deletion Auditability
-- **Original Issue**: Hard deletes erased history.
-- **Remediation Implemented**: **YES** (Soft Deletes)
-- **Details**: 
-    - `deleted_at` timestamp added to schema.
-    - Transaction Deletion now performs a **Soft Delete** (records remain in DB, excluded from queries).
-    - Balances are still reverted to maintain correctness, but the "Voided" transaction remains for DB admins/audit.
+### 4.3. Auditabilitas Penghapusan
+- **Isu Awal**: Penghapusan keras (hard delete) menghapus sejarah.
+- **Perbaikan Terimplementasi**: **YA** (Soft Deletes)
+- **Detail**: 
+    - Timestamp `deleted_at` ditambahkan ke skema.
+    - Penghapusan Transaksi sekarang melakukan **Soft Delete** (catatan tetap ada di DB, dikecualikan dari query).
+    - Saldo tetap dikembalikan (reverted) untuk menjaga kebenaran, tetapi transaksi yang "Dibatalkan" tetap ada untuk admin DB/audit.
 
 ---
 
-## 5. Final Recommendations & Implementation Status
+## 5. Rekomendasi Akhir & Status Implementasi
 
-| Recommendation | Status | Implementation Details |
+| Rekomendasi | Status | Detail Implementasi |
 | :--- | :--- | :--- |
-| **Strict Deletion Policy** | ✅ **Implemented** | Soft Deletes + Lock Date enforcement. |
-| **Schema Hardening** | ✅ **Implemented** | `ON DELETE RESTRICT` applied in migration script. |
-| **UI Feedback** | ✅ **Implemented** | Auto-reconciliation now tags transactions with `[SYSTEM CORRECTION]` prefix. |
+| **Kebijakan Penghapusan Ketat** | ✅ **Terimplementasi** | Soft Deletes + Penegakan Lock Date. |
+| **Pengerasan Skema** | ✅ **Terimplementasi** | `ON DELETE RESTRICT` diterapkan dalam skrip migrasi. |
+| **Umpan Balik UI** | ✅ **Terimplementasi** | Rekonsiliasi otomatis sekarang menandai transaksi dengan prefiks `[SYSTEM CORRECTION]`. |
 
-**Validation Status**: **FULLY COMPLIANT**
-*The system now meets rigorous accounting standards for auditability, integrity, and temporal consistency.*
+**Status Validasi**: **SEPENUHNYA PATUH**
+*Sistem sekarang memenuhi standar akuntansi yang ketat untuk auditabilitas, integritas, dan konsistensi temporal.*

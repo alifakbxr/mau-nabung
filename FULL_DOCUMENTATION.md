@@ -2,8 +2,8 @@
 
 **Dokumen Referensi Pengembangan Perangkat Lunak**  
 **Versi:** 2.1 (Revisi Besar - Detail Teknis Granular)  
-**Status:** Alpha / Active Development  
-**Audience:** Developer, System Architect, Maintainer
+**Status:** Alpha / Pengembangan Aktif  
+**Target Pembaca:** Pengembang, Arsitek Sistem, Pengelola
 
 ---
 
@@ -195,4 +195,4 @@ Script `utils/backup.php` dirancang untuk ketahanan bencana.
     *   Set `date_default_timezone_set()` di `index.php` atau `php.ini`.
 
 ---
-*End of Master Documentation*
+*Akhir dari Dokumentasi Master*

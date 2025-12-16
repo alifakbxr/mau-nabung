@@ -29,6 +29,23 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `settings`
+--
+
+CREATE TABLE IF NOT EXISTS `settings` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL, -- Nullable for global settings, or specific user settings
+  `key_name` varchar(50) NOT NULL,
+  `value` text,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_setting` (`user_id`, `key_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `categories`
 --
 
@@ -44,8 +61,6 @@ CREATE TABLE IF NOT EXISTS `categories` (
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_categories_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
 
 -- --------------------------------------------------------
 
@@ -72,6 +87,26 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `accounts`
+--
+
+CREATE TABLE IF NOT EXISTS `accounts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `type` enum('cash','bank','ewallet','investment','credit_card','loan') NOT NULL,
+  `balance` decimal(15,2) DEFAULT 0.00,
+  `is_default` tinyint(1) DEFAULT 0,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `fk_accounts_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `transactions`
 --
 
@@ -87,6 +122,7 @@ CREATE TABLE IF NOT EXISTS `transactions` (
   `transaction_date` date NOT NULL,
   `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `category_id` (`category_id`),
@@ -94,8 +130,8 @@ CREATE TABLE IF NOT EXISTS `transactions` (
   KEY `related_account_id` (`related_account_id`),
   CONSTRAINT `fk_transactions_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_transactions_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `fk_transactions_account` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `fk_transactions_related_account` FOREIGN KEY (`related_account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL
+  CONSTRAINT `fk_transactions_account_strict` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_transactions_related_account_strict` FOREIGN KEY (`related_account_id`) REFERENCES `accounts` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -143,27 +179,6 @@ CREATE TABLE IF NOT EXISTS `recurring_transactions` (
   CONSTRAINT `fk_recurring_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-
--- --------------------------------------------------------
-
---
--- Table structure for table `accounts`
---
-
-CREATE TABLE IF NOT EXISTS `accounts` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `type` enum('cash','bank','ewallet','investment','credit_card','loan') NOT NULL,
-  `balance` decimal(15,2) DEFAULT 0.00,
-  `is_default` tinyint(1) DEFAULT 0,
-  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `fk_accounts_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 -- --------------------------------------------------------
 
 --
@@ -185,41 +200,4 @@ CREATE TABLE IF NOT EXISTS `savings_goals` (
   CONSTRAINT `fk_goals_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Modifying Transactions Table
--- Note: This is a schema file, so we assume these columns are added during init or migration.
--- For existing DB, you might need ALTER TABLE commands via a migration script.
--- But here we update the definition for new setups or manual alter.
-
--- We assume this file is run for setup. If table transactions already exists, these lines effectively document the change 
--- or you'd use specific ALTER statements if running against existing DB. 
--- Since I can't run the SQL directly against a live DB here easily without a migration tool, I will add the column definition to the CREATE TABLE `transactions` block above.
-
--- WAIT, better to modify the CREATE TABLE `transactions` block directly if this is the "source of truth".
--- But the user might have an existing DB.
--- I will add ALTER statements at the end for compatibility if run incrementally, 
--- but ideally I should modify the CREATE statement earlier.
--- Given I am editing the file, I will just append ALTER statements before COMMIT so if the user runs this file, it tries to add them.
--- However, SQL scripts with IF NOT EXISTS usually skip creation.
--- I'll add the ALTER statements safely.
-
--- Add account_id to transactions if not exists (This is hard in pure SQL without procedures).
--- I will just comment that these should be added.
--- ACTUALLY, I will add the definitions to the END, assuming the user might run this to patch.
-
--- Adding relationships
-
 COMMIT;
-
--- Manual ALTERs for existing installations (Run these if tables already exist)
--- ALTER TABLE `transactions` ADD COLUMN `account_id` INT DEFAULT NULL AFTER `user_id`;
--- ALTER TABLE `transactions` ADD CONSTRAINT `fk_transactions_account` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL;
-
--- NEW MIGRATIONS FOR TRANSFERS & COMPLIANCE
--- ALTER TABLE `transactions` MODIFY COLUMN `type` ENUM('income','expense','transfer','adjustment') NOT NULL;
--- ALTER TABLE `transactions` ADD COLUMN `related_account_id` INT DEFAULT NULL AFTER `account_id`;
--- ALTER TABLE `transactions` ADD CONSTRAINT `fk_transactions_related_account` FOREIGN KEY (`related_account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL;
--- ALTER TABLE `accounts` MODIFY COLUMN `type` ENUM('cash','bank','ewallet','investment','credit_card','loan') NOT NULL;
-
