@@ -7,6 +7,12 @@ use App\Core\Model;
 class Transaction extends Model {
     protected $table = 'transactions';
 
+    public function findById($id) {
+        $stmt = $this->db->prepare("SELECT * FROM transactions WHERE id = :id AND deleted_at IS NULL");
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch();
+    }
+
     public function getByUser($userId, $limit = null, $filters = []) {
         $sql = "SELECT t.*, 
                        c.name as category_name, 
@@ -17,7 +23,7 @@ class Transaction extends Model {
                 LEFT JOIN categories c ON t.category_id = c.id 
                 LEFT JOIN accounts a ON t.account_id = a.id
                 LEFT JOIN accounts ra ON t.related_account_id = ra.id
-                WHERE t.user_id = :user_id";
+                WHERE t.user_id = :user_id AND t.deleted_at IS NULL";
         
         $params = ['user_id' => $userId];
 
@@ -81,7 +87,8 @@ class Transaction extends Model {
     }
     
     public function deleteForUser($id, $userId) {
-        $stmt = $this->db->prepare("DELETE FROM transactions WHERE id = :id AND user_id = :user_id");
+        // Soft Delete
+        $stmt = $this->db->prepare("UPDATE transactions SET deleted_at = NOW() WHERE id = :id AND user_id = :user_id");
         return $stmt->execute(['id' => $id, 'user_id' => $userId]);
     }
 
@@ -90,7 +97,9 @@ class Transaction extends Model {
                     SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as total_income,
                     SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as total_expense
                 FROM transactions 
-                WHERE user_id = :user_id AND transaction_date BETWEEN :start_date AND :end_date";
+                WHERE user_id = :user_id 
+                AND transaction_date BETWEEN :start_date AND :end_date
+                AND deleted_at IS NULL";
         
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
@@ -108,6 +117,7 @@ class Transaction extends Model {
                 WHERE t.user_id = :user_id 
                 AND t.type = :type
                 AND t.transaction_date BETWEEN :start_date AND :end_date
+                AND t.deleted_at IS NULL
                 GROUP BY c.id
                 ORDER BY total DESC";
         
