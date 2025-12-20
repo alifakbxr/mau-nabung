@@ -34,7 +34,7 @@
                     <div class="progress-bar rounded-pill" role="progressbar" style="width: <?= $percentage ?>%; background-color: <?= $goal['color'] ?>" aria-valuenow="<?= $percentage ?>" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
 
-                <div class="d-flex justify-content-between text-muted small">
+                <div class="d-flex justify-content-between text-muted small mb-3">
                     <span><?= number_format($percentage, 0) ?>% Tercapai</span>
                     <?php if ($timeLeft !== null): ?>
                         <span><?= $timeLeft > 0 ? ceil($timeLeft) . ' hari lagi' : 'Jatuh tempo' ?></span>
@@ -42,10 +42,51 @@
                         <span>Tidak ada batas waktu</span>
                     <?php endif; ?>
                 </div>
+
+                <div class="d-grid">
+                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addFundsModal" 
+                        onclick="setGoalInfo('<?= $goal['id'] ?>', '<?= htmlspecialchars($goal['name']) ?>')">
+                        <i class="fas fa-plus-circle me-1"></i> Nabung (Alokasi Dana)
+                    </button>
+                </div>
             </div>
         </div>
     </div>
     <?php endforeach; ?>
 </div>
+
+<!-- Add Funds Modal -->
+<div class="modal fade" id="addFundsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="<?= base_url('/goals/add-funds') ?>" method="POST">
+                <?= csrf_field() ?>
+                <input type="hidden" name="id" id="modal_goal_id">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nabung ke: <span id="modal_goal_name" class="fw-bold"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Jumlah Alokasi (Rp)</label>
+                        <input type="number" name="amount" class="form-control" required min="1" placeholder="Contoh: 500000">
+                        <div class="form-text">Uang ini akan ditambahkan ke progress target, tapi tidak mengubah saldo akun kas/bank Anda (Virtual Allocation).</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function setGoalInfo(id, name) {
+    document.getElementById('modal_goal_id').value = id;
+    document.getElementById('modal_goal_name').textContent = name;
+}
+</script>
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>

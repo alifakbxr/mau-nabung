@@ -67,4 +67,14 @@ class ReportController {
         fclose($output);
         exit;
     }
+    public function audit() {
+        if (!isset($_SESSION['user_id'])) {
+            View::redirect('/login');
+        }
+
+        $auditModel = new \App\Models\AuditLog();
+        $logs = $auditModel->getRecent(100);
+
+        View::render('reports/audit', ['logs' => $logs]);
+    }
 }

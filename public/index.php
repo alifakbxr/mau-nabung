@@ -77,10 +77,17 @@ $router->add('GET', '/goals', 'SavingsGoalController', 'index');
 $router->add('GET', '/goals/create', 'SavingsGoalController', 'create');
 $router->add('POST', '/goals/store', 'SavingsGoalController', 'store');
 $router->add('POST', '/goals/delete', 'SavingsGoalController', 'delete');
+$router->add('GET', '/goals/simulate', 'SavingsGoalController', 'simulate');
+$router->add('POST', '/goals/add-funds', 'SavingsGoalController', 'addFunds');
 
 // Reports
 $router->add('GET', '/reports', 'ReportController', 'index');
 $router->add('GET', '/reports/export', 'ReportController', 'export');
+$router->add('GET', '/reports/audit', 'ReportController', 'audit');
+
+// Salary Allocator
+$router->add('GET', '/salary/allocator', 'SalaryController', 'index');
+$router->add('POST', '/salary/process', 'SalaryController', 'process');
 
 // Profile
 $router->add('GET', '/profile', 'ProfileController', 'index');

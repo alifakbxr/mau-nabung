@@ -20,4 +20,16 @@ class AuditLog extends Model {
             'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'UNKNOWN'
         ]);
     }
+    public function getRecent($limit = 50) {
+        $stmt = $this->db->prepare("
+            SELECT a.*, u.full_name as user_name 
+            FROM audit_logs a 
+            LEFT JOIN users u ON a.user_id = u.id 
+            ORDER BY a.created_at DESC 
+            LIMIT :limit
+        ");
+        $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 }
