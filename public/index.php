@@ -9,7 +9,7 @@ spl_autoload_register(function ($class) {
 
     $len = strlen($prefix);
     if (strncmp($prefix, $class, $len) !== 0) {
-        return;
+        return; 
     }
 
     $relative_class = substr($class, $len);
@@ -42,7 +42,7 @@ function esc($string) {
 
 // Define Routes
 // Auth
-$router->add('GET', '/', 'AuthController', 'login');
+$router->add('GET', '/', 'DashboardController', 'index');
 $router->add('GET', '/login', 'AuthController', 'login');
 $router->add('POST', '/login', 'AuthController', 'processLogin');
 $router->add('GET', '/register', 'AuthController', 'register');
@@ -88,6 +88,19 @@ $router->add('GET', '/reports/audit', 'ReportController', 'audit');
 // Salary Allocator
 $router->add('GET', '/salary/allocator', 'SalaryController', 'index');
 $router->add('POST', '/salary/process', 'SalaryController', 'process');
+
+// Pages
+$router->add('GET', '/features', 'PageController', 'features');
+$router->add('GET', '/about', 'PageController', 'about');
+$router->add('GET', '/how-it-works', 'PageController', 'howItWorks');
+$router->add('GET', '/contact', 'PageController', 'contact');
+$router->add('GET', '/compare', 'PageController', 'compare');
+$router->add('GET', '/faq', 'PageController', 'faq');
+
+// Legal
+$router->add('GET', '/terms', 'PageController', 'terms');
+$router->add('GET', '/privacy', 'PageController', 'privacy');
+$router->add('GET', '/cookie-policy', 'PageController', 'cookiePolicy');
 
 // Profile
 $router->add('GET', '/profile', 'ProfileController', 'index');

@@ -5,8 +5,8 @@
     /* Royal Blue */
     --primary-hover: #1d4ed8;
     /* Darker Blue */
-    --secondary-color: #64748b;
-    /* Slate 500 */
+    --secondary-color: #475569;
+    /* Slate 600 */
 
     /* Functional Colors */
     --success-color: #059669;
@@ -20,20 +20,20 @@
     --info-color: #3b82f6;
     /* Blue 500 */
 
-    /* Neutrals */
-    --dark-bg: #111827;
-    /* Gray 900 - Sidebar */
-    --body-bg: #f3f4f6;
-    /* Gray 100 - Main BG */
+    /* Neutrals - High Contrast Theme */
+    --dark-bg: #0f172a;
+    /* Slate 900 */
+    --body-bg: #f8fafc;
+    /* Slate 50 */
     --card-bg: #ffffff;
-    --text-main: #1f2937;
-    /* Gray 800 */
-    --text-secondary: #4b5563;
-    /* Gray 600 */
-    --text-muted: #9ca3af;
-    /* Gray 400 */
-    --border-color: #e5e7eb;
-    /* Gray 200 */
+    --text-main: #0f172a;
+    /* Slate 900 - High Contrast */
+    --text-secondary: #334155;
+    /* Slate 700 - Highly Readable */
+    --text-muted: #64748b;
+    /* Slate 500 - Clear Hint Text */
+    --border-color: #cbd5e1;
+    /* Slate 300 - Defined Borders */
 
     /* UI Properties */
     --radius-sm: 0.375rem;
@@ -173,69 +173,65 @@ a {
     font-size: 0.9rem;
 }
 
-/* Sidebar - Dark & Sleek */
-.sidebar {
-    background-color: var(--dark-bg);
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: var(--sidebar-width);
-    padding: 2rem 1rem;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
+/* Navbar - Clean & Modern */
+.navbar {
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-sm);
 }
 
-.sidebar-brand {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: white;
-    padding: 0 1rem 2.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    letter-spacing: -0.03em;
-}
-
-.sidebar-brand i {
-    color: var(--primary-color);
-    /* Logo accent */
-}
-
-.nav-link {
-    color: #9ca3af;
-    /* Muted text for dark bg */
-    padding: 0.875rem 1rem;
+.navbar .nav-link {
+    color: var(--text-secondary);
     font-weight: 500;
+    padding: 0.6rem 1rem;
     border-radius: var(--radius-md);
-    margin-bottom: 0.25rem;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
 
-.nav-link:hover {
-    color: white;
-    background-color: rgba(255, 255, 255, 0.05);
+.navbar .nav-link:hover {
+    color: var(--primary-color);
+    background-color: #eff6ff;
+    /* Soft blue hover */
 }
 
-.nav-link.active {
-    color: white;
+.navbar .nav-link.active {
+    color: var(--primary-color);
+    background-color: #eff6ff;
+    font-weight: 600;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-item:active,
+.dropdown-item:focus {
     background-color: var(--primary-color);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-    /* Glow effect */
-}
-
-.nav-link i {
-    width: 24px;
-    text-align: center;
-    font-size: 1.1rem;
+    color: white;
 }
 
 /* Main Content Area */
 .main-content {
-    margin-left: var(--sidebar-width);
-    padding: 2.5rem;
-    min-height: 100vh;
+    padding: 3rem 2rem;
+    /* Wider desktop padding */
+    min-height: calc(100vh - 76px);
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 /* Stats Cards - Modern */
@@ -338,24 +334,116 @@ a {
     font-weight: 600 !important;
 }
 
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-100%);
-        width: 260px;
+/* Tablet Responsive (992px - 1199px) */
+@media (max-width: 1199.98px) {
+    .main-content {
+        padding: 2.5rem 1.5rem;
+    }
+}
+
+/* Mobile/Tablet Responsive (< 992px) */
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        background: white;
+        padding: 1rem;
+        border-radius: var(--radius-md);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        margin-top: 1rem;
+        border: 1px solid var(--border-color);
+        max-height: 80vh;
+        overflow-y: auto;
     }
 
-    .sidebar.show {
-        transform: translateX(0);
-        box-shadow: 10px 0 20px rgba(0, 0, 0, 0.1);
+    .navbar-nav {
+        gap: 0.5rem;
     }
 
     .main-content {
-        margin-left: 0;
-        padding: 1.5rem;
+        padding: 2rem 1rem;
+        /* Balanced tablet/mobile spacing */
+    }
+}
+
+/* Small Mobile (< 576px) */
+@media (max-width: 575.98px) {
+    .main-content {
+        padding: 1.5rem 0.75rem;
+        /* Tighter padding for phones */
     }
 
-    .sidebar-brand {
-        justify-content: center;
+    .card-body {
+        padding: 1rem;
+        /* Compact card content */
     }
+
+    .card-header {
+        padding: 1rem;
+    }
+}
+
+/* Landing Page Styles */
+.hero-section {
+    background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.05), transparent 40%),
+        radial-gradient(circle at bottom left, rgba(37, 99, 235, 0.05), transparent 40%);
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #60a5fa 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hover-lift {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.hover-up {
+    transition: transform 0.2s ease;
+}
+
+.hover-up:hover {
+    transform: translateY(-5px);
+}
+
+.transform-tilt-left {
+    transition: transform 0.5s ease-out;
+}
+
+.transform-tilt-left:hover {
+    transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.02);
+}
+
+.bg-white\/95 {
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+.backdrop-blur {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.blur-3xl {
+    filter: blur(64px);
+}
+
+.shadow-2xl {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.icon-box {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-gradient-light {
+    background: linear-gradient(to bottom, #ffffff, #f8fafc);
 }

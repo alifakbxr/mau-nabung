@@ -4,7 +4,9 @@
     <div class="card shadow-sm border-0" style="max-width: 400px; width: 100%;">
         <div class="card-body p-5">
             <div class="text-center mb-5">
-                <h1 class="h3 fw-bold text-dark mb-2"><i class="fas fa-wallet text-primary"></i> Maunabung</h1>
+                <h1 class="h3 fw-bold text-dark mb-2">
+                    <img src="<?= base_url('/assets/img/maunabung_logo.png') ?>" alt="Maunabung" height="32">
+                </h1>
                 <p class="text-secondary">Masuk untuk mengelola keuanganmu</p>
             </div>
 

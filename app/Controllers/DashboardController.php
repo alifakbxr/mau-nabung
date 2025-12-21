@@ -11,7 +11,7 @@ use App\Models\SavingsGoal;
 class DashboardController {
     public function index() {
         if (!isset($_SESSION['user_id'])) {
-            View::redirect('/login');
+            return View::render('pages/landing');
         }
 
         $userId = $_SESSION['user_id'];

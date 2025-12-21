@@ -22,65 +22,90 @@
 <body>
 
 <?php if (isset($_SESSION['user_id'])): ?>
-    <!-- Mobile Toggle -->
-    <button class="btn btn-dark d-md-none position-fixed top-0 start-0 m-3 z-3 shadow-lg rounded-circle p-3" style="width: 50px; height: 50px;" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
-        <i class="fas fa-bars"></i>
-    </button>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg fixed-top bg-white border-bottom">
+        <div class="container-fluid px-4 py-2">
+            <!-- Brand -->
+            <a class="navbar-brand d-block" href="<?= base_url('/dashboard') ?>">
+                <img src="<?= base_url('/assets/img/maunabung_logo.png') ?>" alt="Maunabung" height="32">
+            </a>
 
-    <!-- Sidebar -->
-    <nav class="sidebar d-none d-md-flex">
-        <div class="sidebar-brand">
-            <i class="fas fa-wallet"></i> Maunabung
-        </div>
-        <div class="d-flex flex-column gap-1 flex-grow-1">
-            <a href="<?= base_url('/dashboard') ?>" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/dashboard') !== false ? 'active' : '' ?>">
-                <i class="fas fa-home"></i> Dashboard
-            </a>
-            <a href="<?= base_url('/transactions') ?>" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/transactions') !== false ? 'active' : '' ?>">
-                <i class="fas fa-exchange-alt"></i> Transaksi
-            </a>
-            <a href="<?= base_url('/accounts') ?>" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/accounts') !== false ? 'active' : '' ?>">
-                <i class="fas fa-wallet"></i> Dompet
-            </a>
-            <a href="<?= base_url('/goals') ?>" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/goals') !== false ? 'active' : '' ?>">
-                <i class="fas fa-bullseye"></i> Target
-            </a>
-            <a href="<?= base_url('/categories') ?>" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/categories') !== false ? 'active' : '' ?>">
-                <i class="fas fa-tags"></i> Kategori
-            </a>
-            <a href="<?= base_url('/reports') ?>" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/reports') !== false ? 'active' : '' ?>">
-                <i class="fas fa-chart-pie"></i> Laporan
-            </a>
-            <a href="<?= base_url('/profile') ?>" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/profile') !== false ? 'active' : '' ?>">
-                <i class="fas fa-user"></i> Profil
-            </a>
-        </div>
-        <div class="mt-auto">
-            <a href="<?= base_url('/logout') ?>" class="nav-link text-danger">
-                <i class="fas fa-sign-out-alt"></i> Keluar
-            </a>
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navbar Content -->
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <!-- Main Menu -->
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-1">
+                    <li class="nav-item">
+                        <a href="<?= base_url('/dashboard') ?>" class="nav-link px-3 <?= strpos($_SERVER['REQUEST_URI'], '/dashboard') !== false ? 'active' : '' ?>">
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= base_url('/transactions') ?>" class="nav-link px-3 <?= strpos($_SERVER['REQUEST_URI'], '/transactions') !== false ? 'active' : '' ?>">
+                            Transaksi
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= base_url('/accounts') ?>" class="nav-link px-3 <?= strpos($_SERVER['REQUEST_URI'], '/accounts') !== false ? 'active' : '' ?>">
+                            Dompet
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= base_url('/goals') ?>" class="nav-link px-3 <?= strpos($_SERVER['REQUEST_URI'], '/goals') !== false ? 'active' : '' ?>">
+                            Target
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= base_url('/categories') ?>" class="nav-link px-3 <?= strpos($_SERVER['REQUEST_URI'], '/categories') !== false ? 'active' : '' ?>">
+                            Kategori
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= base_url('/reports') ?>" class="nav-link px-3 <?= strpos($_SERVER['REQUEST_URI'], '/reports') !== false ? 'active' : '' ?>">
+                            Laporan
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- User Menu & Actions -->
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
+                    <li class="nav-item d-none d-lg-block">
+                        <div class="vr h-100 mx-2 text-muted opacity-25"></div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center border" style="width: 36px; height: 36px;">
+                                <i class="fas fa-user text-secondary"></i>
+                            </div>
+                            <span class="d-lg-none">Akun Saya</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm mt-3 p-2 rounded-3">
+                            <li>
+                                <a class="dropdown-item rounded-2 px-3 py-2" href="<?= base_url('/profile') ?>">
+                                    <i class="fas fa-user me-2 text-muted"></i> Profil
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item rounded-2 px-3 py-2" href="<?= base_url('/faq') ?>">
+                                    <i class="fas fa-question-circle me-2 text-muted"></i> Bantuan
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item rounded-2 px-3 py-2 text-danger" href="<?= base_url('/logout') ?>">
+                                    <i class="fas fa-sign-out-alt me-2"></i> Keluar
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
-
-    <!-- Mobile Sidebar (Offcanvas) -->
-    <div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="sidebarMenu">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title fw-bold text-white"><i class="fas fa-wallet text-primary"></i> Maunabung</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
-        </div>
-        <div class="offcanvas-body d-flex flex-column">
-            <div class="d-flex flex-column gap-2 flex-grow-1">
-                <a href="<?= base_url('/dashboard') ?>" class="nav-link text-white-50"><i class="fas fa-home me-2"></i> Dashboard</a>
-                <a href="<?= base_url('/transactions') ?>" class="nav-link text-white-50"><i class="fas fa-exchange-alt me-2"></i> Transaksi</a>
-                <a href="<?= base_url('/categories') ?>" class="nav-link text-white-50"><i class="fas fa-tags me-2"></i> Kategori</a>
-                <a href="<?= base_url('/reports') ?>" class="nav-link text-white-50"><i class="fas fa-chart-pie me-2"></i> Laporan</a>
-                <a href="<?= base_url('/profile') ?>" class="nav-link text-white-50"><i class="fas fa-user me-2"></i> Profil</a>
-            </div>
-            <div class="mt-auto">
-                <a href="<?= base_url('/logout') ?>" class="nav-link text-danger"><i class="fas fa-sign-out-alt me-2"></i> Keluar</a>
-            </div>
-        </div>
-    </div>
-
-    <main class="main-content">
+    <div style="height: 76px;"></div> <!-- Spacer for fixed navbar -->
+    <main class="main-content pt-4">
 <?php endif; ?>
