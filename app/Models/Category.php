@@ -13,6 +13,12 @@ class Category extends Model {
         return $stmt->fetchAll();
     }
 
+    public function getByUserAndType($userId, $type) {
+        $stmt = $this->db->prepare("SELECT * FROM categories WHERE user_id = :user_id AND type = :type ORDER BY name");
+        $stmt->execute(['user_id' => $userId, 'type' => $type]);
+        return $stmt->fetchAll();
+    }
+
     public function create($data) {
         $stmt = $this->db->prepare("INSERT INTO categories (user_id, name, type, color) VALUES (:user_id, :name, :type, :color)");
         return $stmt->execute([

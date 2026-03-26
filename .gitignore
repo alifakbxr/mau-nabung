@@ -1,0 +1,80 @@
+# Dependencies
+/vendor/
+/composer/
+
+# Environment & Configuration
+.env
+.env.local
+.env.*.local
+config/database.local.php
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+cache/
+temp/
+tmp/
+sessions/
+uploads/
+backups/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Testing
+.phpunit.result.cache
+coverage/
+.phpunit/
+
+# Build artifacts
+dist/
+build/
+
+# Database (optional - uncomment if you don't want to track SQL files)
+# db/*.sql
+# db/migrations/*.sql
+
+# Secrets (never commit these)
+*.key
+*.pem
+*.crt
+private/
+
+# Composer
+composer.lock
+
+# Node (if using frontend build tools)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Public uploads (user-generated content)
+public/uploads/
+public/assets/cache/
+
+# Backup files
+*.bak
+*.backup
+*.sql.gz
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local development
+localhost.sql
+dump.sql
+*.local.php
+QWEN.md

@@ -13,11 +13,11 @@
         <form action="<?= base_url('/reports') ?>" method="GET" class="row g-3 align-items-end">
             <div class="col-md-4">
                 <label class="form-label small text-muted">Dari Tanggal</label>
-                <input type="date" name="start_date" class="form-control" value="<?= $startDate ?>">
+                <input type="date" name="start_date" class="form-control" value="<?= (string)$startDate ?>">
             </div>
             <div class="col-md-4">
                 <label class="form-label small text-muted">Sampai Tanggal</label>
-                <input type="date" name="end_date" class="form-control" value="<?= $endDate ?>">
+                <input type="date" name="end_date" class="form-control" value="<?= (string)$endDate ?>">
             </div>
             <div class="col-md-4">
                 <button type="submit" class="btn btn-primary w-100">Tampilkan Laporan</button>
