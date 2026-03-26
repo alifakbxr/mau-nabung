@@ -19,7 +19,6 @@
 - [About](#-about)
 - [Features](#-features)
 - [Quick Start](#-quick-start)
-- [Documentation](#-documentation)
 - [Architecture](#-architecture)
 - [Development](#-development)
 - [Security](#-security--integrity)
@@ -136,38 +135,6 @@ docker-compose up -d
 ```
 
 Access at: `http://localhost:8080`
-
----
-
-## 📚 Documentation
-
-| Document | Description |
-|----------|-------------|
-| **[README.md](README.md)** | This file - quick start and overview |
-| **[QWEN.md](QWEN.md)** | Technical documentation and architecture |
-| **[CONTRIBUTING.md](CONTRIBUTING.md)** | Contribution guidelines and coding standards |
-| **[CHANGELOG.md](CHANGELOG.md)** | Version history and changes |
-| **[SECURITY.md](SECURITY.md)** | Security policy and best practices |
-| **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** | Production deployment guide |
-| **[docs/DATABASE.md](docs/DATABASE.md)** | Complete database schema reference |
-| **[docs/WIKI.md](docs/WIKI.md)** | Comprehensive wiki and user guide |
-
-### 📖 Quick Links
-
-**For Users:**
-- [Installation Guide](#-installation)
-- [Features Overview](#-features)
-- [Troubleshooting](#-troubleshooting)
-
-**For Developers:**
-- [Architecture Overview](#-architecture)
-- [Development Guide](#-development)
-- [Database Schema](docs/DATABASE.md)
-
-**For Contributors:**
-- [Contributing Guidelines](CONTRIBUTING.md)
-- [Code Standards](CONTRIBUTING.md#coding-standards)
-- [Pull Request Template](.github/PULL_REQUEST_TEMPLATE.md)
 
 ---
 
